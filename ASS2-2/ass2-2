@@ -1,0 +1,280 @@
+#include <iostream>
+class BusParking{
+public:
+    int count;
+    class Node;
+    Node** frag;
+public:
+    BusParking()
+    {
+       this->count=0;
+       this->frag=new Node *[1];
+       this->frag[0]=NULL;
+
+    }
+    ~BusParking()
+    {
+        this->count=0;
+        
+    }
+    class Node
+    {
+    public:
+        int s;
+        int t;
+        Node* next;
+        Node* prv;
+        
+        Node()
+        {
+            this->s=0;
+            this->t=0;
+            this->next=NULL;
+            this->prv=NULL;
+            
+        }
+        Node(int s,int t)
+        {
+            this->s=s;
+            this->t=t;
+            this->next=NULL;
+            this->prv=NULL;
+        }
+    };
+    bool add_bool(int s,int t)
+    {
+        
+        Node* a=new Node(s,t);
+        if(count==0)
+        {
+            this->frag[0]=a;
+            this->count++;
+        }
+        else
+        {
+            for(int j=0;j<this->count;j++)
+            {
+               
+                Node* ptr=this->frag[j];
+                while (ptr!=NULL)
+                {
+                    if(ptr->prv==NULL)
+                    {
+                        if(t<ptr->s)
+                        {
+                            ptr->prv=a;
+                            a->next=ptr;
+                            this->frag[j]=a;
+                            return true;
+                        }
+                        
+                    }
+                    if(ptr->next==NULL)
+                    {
+                        if(s>ptr->t) 
+                        {
+                            ptr->next=a;
+                            a->prv=ptr;
+                            return true;
+                        }
+                    }
+                    if(ptr->t<s&&ptr->next->s>t)
+                    {
+                        ptr->next->prv=a;
+                        a->next=ptr->next;
+                        ptr->next=a;
+                        a->prv=ptr;
+                        return true;
+                    }
+                    
+                    ptr=ptr->next;
+                }
+                
+                
+                
+            }
+            this->count++;
+            this->frag[count-1]=a;
+            return true;
+            
+        }
+        return false;
+    }
+    void add(int s, int t) 
+    {
+        t=t-1;
+        bool k=false;
+        this->add(s,t,k);
+    }
+    void add(int s,int t, bool &k)
+    {
+        k=add_bool(s,t);
+    }
+    void remo(int s,int t)
+    {
+        for(int i=0;i<this->count;i++)
+        {
+            Node* ptr=this->frag[i];
+            while(ptr!=NULL)
+            {
+                if(ptr->s==s&&ptr->t==t)
+                {
+                    if(ptr->prv==NULL)
+                    {
+                        if(ptr->next==NULL)
+                        {
+                            for(int j=i;j<this->count;j++)
+                            {
+                                this->frag[j]=this->frag[j+1];
+                            }
+                            this->count--;
+                            return;
+                        }
+                        ptr=ptr->next;
+                        ptr->prv=NULL;
+                        this->frag[i]=ptr;
+                        return;
+                    }
+                    if(ptr->next==NULL)
+                    {
+                        ptr->prv->next=NULL;
+                        return;
+                    }
+                   
+                    ptr->prv->next=ptr->next;
+                    ptr->next->prv=ptr->prv;
+
+                
+                }
+                ptr=ptr->next;
+            }
+            
+        }
+    }
+    void dieuchinh(Node* ptr,int i,int &min)
+    {
+        if(ptr->prv==NULL)
+        {
+            if(ptr->next==NULL)
+            {
+                for(int j=i;j<min;j++)
+                {
+                    this->frag[j]=this->frag[j+1];
+                }
+                min--;
+                return;
+            }
+            else
+            {
+                ptr=ptr->next;
+                ptr->prv=NULL;
+                this->frag[i]=ptr;
+                return;
+            }
+            
+        }
+        if(ptr->next==NULL)
+        {
+            ptr=ptr->prv->next=NULL;
+            return;
+        }
+    }
+    bool add_(int s,int t)
+    {
+        
+        Node* a=new Node(s,t);
+        if(count==0)
+        {
+            this->frag[0]=a;
+            this->count++;
+        }
+        else
+        {
+            for(int j=0;j<this->count;j++)
+            {
+               
+                Node* ptr=this->frag[j];
+                while (ptr!=NULL)
+                {
+                    if(ptr->prv==NULL)
+                    {
+                        if(t<ptr->s)
+                        {
+                            ptr->prv=a;
+                            a->next=ptr;
+                            this->frag[j]=a;
+                            return true;
+                        }
+                        
+                    }
+                    if(ptr->next==NULL)
+                    {
+                        if(s>ptr->t) 
+                        {
+                            ptr->next=a;
+                            a->prv=ptr;
+                            return true;
+                        }
+                    }
+                    if(ptr->t<s&&ptr->next->s>t)
+                    {
+                        ptr->next->prv=a;
+                        a->next=ptr->next;
+                        ptr->next=a;
+                        a->prv=ptr;
+                        return true;
+                    }
+                    
+                    ptr=ptr->next;
+                }
+                
+                
+                
+            }
+           
+            
+        }
+        return false;
+    }
+    void remove(int s, int t) {
+        t=t-1;
+        this->remo(s,t);
+        ///
+        
+        bool thaydoi=false;
+        int min=this->count;
+        if(this->count>1)
+        {
+            for(int i=1;i<min;i++)
+            {
+                Node* ptr=this->frag[i];
+                while (ptr!=NULL)
+                {
+                    this->count=i;
+                    thaydoi=add_(ptr->s,ptr->t);
+
+                    
+                    
+                    if(thaydoi==true)
+                    {
+                        this->dieuchinh(ptr,i,min);
+                    }
+                    ptr=ptr->next;
+                }   
+            }
+        }
+        this->count=min;   
+    }
+    
+    int minPark() {
+        return this->count;
+    }
+    }
+    int main()
+    {
+      b->add(1, 5);
+      b->add(2, 5);
+      b->add(3, 5);
+      cout << b->minPark();
+      return 0;
+    }
